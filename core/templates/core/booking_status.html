@@ -1,0 +1,105 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header
+                    {% if booking.status == 'cancelled' %}bg-danger
+                    {% elif booking.status == 'completed' %}bg-success
+                    {% else %}bg-primary{% endif %} text-white">
+                    <h3 class="mb-0">Booking Status #{{ booking.id }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Patient Information</h5>
+                            <p><strong>Name:</strong> {{ booking.patient_name }}</p>
+                            <p><strong>Age:</strong> {{ booking.patient_age|default:"Not specified" }}</p>
+                            <p><strong>Emergency Details:</strong> {{ booking.emergency_details }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Location Details</h5>
+                            <p><strong>Pickup:</strong> {{ booking.pickup_location }}</p>
+                            <p><strong>Drop-off:</strong> {{ booking.dropoff_location|default:"Not specified" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Booking Information</h5>
+                            <p><strong>Status:</strong>
+                                <span class="badge
+                                    {% if booking.status == 'pending' %}bg-warning
+                                    {% elif booking.status == 'accepted' %}bg-primary
+                                    {% elif booking.status == 'en_route' %}bg-info
+                                    {% elif booking.status == 'arrived' %}bg-success
+                                    {% elif booking.status == 'completed' %}bg-success
+                                    {% elif booking.status == 'cancelled' %}bg-danger
+                                    {% endif %} fs-6">
+                                    {{ booking.get_status_display }}
+                                </span>
+                            </p>
+                            <p><strong>Booking Time:</strong> {{ booking.booking_time|date:"M d, Y H:i" }}</p>
+                            <p><strong>Estimated Arrival:</strong>
+                                {% if booking.estimated_arrival %}
+                                    {{ booking.estimated_arrival|timeuntil }}
+                                {% else %}
+                                    Yet to be determined
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Ambulance Information</h5>
+                            {% if booking.ambulance %}
+                                <p><strong>Vehicle:</strong> {{ booking.ambulance.vehicle_number }}</p>
+                                <p><strong>Type:</strong> {{ booking.ambulance.get_ambulance_type_display }}</p>
+                                <p><strong>Driver:</strong> {{ booking.ambulance.driver_name }}</p>
+                                <p><strong>Driver Contact:</strong> {{ booking.ambulance.driver_phone }}</p>
+                            {% else %}
+                                <p>No ambulance assigned yet</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if booking.status == 'pending' %}
+                        <div class="alert alert-warning">
+                            <h5>Your booking is pending</h5>
+                            <p>We are finding an available ambulance for you. Please wait...</p>
+                        </div>
+                        <form method="post" action="{% url 'cancel_booking' booking.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this booking?')">
+                                Cancel Booking
+                            </button>
+                        </form>
+                    {% elif booking.status == 'accepted' or booking.status == 'en_route' %}
+                        <div class="alert alert-info">
+                            <h5>Ambulance is on the way!</h5>
+                            <p>Your ambulance has been dispatched and is en route to your location.</p>
+                        </div>
+                    {% elif booking.status == 'arrived' or booking.status == 'completed' %}
+                        <div class="alert alert-success">
+                            <h5>Service Completed</h5>
+                            <p>Your ambulance service has been completed. Thank you for using our service.</p>
+                        </div>
+                    {% elif booking.status == 'cancelled' %}
+                        <div class="alert alert-danger">
+                            <h5>Booking Cancelled</h5>
+                            <p>This booking has been cancelled.</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+                        {% if booking.status != 'cancelled' and booking.status != 'completed' %}
+                            <a href="{% url 'track_ambulance' %}" class="btn btn-primary">Track Ambulance</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
