@@ -1,0 +1,117 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Admin Dashboard</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Bookings</h5>
+                    <h2>{{ total_bookings }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Bookings</h5>
+                    <h2>{{ pending_bookings }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Available Ambulances</h5>
+                    <h2>{{ available_ambulances }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Recent Bookings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Patient</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in recent_bookings %}
+                                <tr>
+                                    <td>#{{ booking.id }}</td>
+                                    <td>{{ booking.patient_name }}</td>
+                                    <td>
+                                        <span class="badge
+                                            {% if booking.status == 'pending' %}bg-warning
+                                            {% elif booking.status == 'accepted' %}bg-primary
+                                            {% elif booking.status == 'completed' %}bg-success
+                                            {% endif %}">
+                                            {{ booking.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'admin:core_booking_change' booking.id %}" class="btn btn-sm btn-info">View</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Ambulance Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle</th>
+                                    <th>Driver</th>
+                                    <th>Status</th>
+                                    <th>Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ambulance in ambulances %}
+                                <tr>
+                                    <td>{{ ambulance.vehicle_number }}</td>
+                                    <td>{{ ambulance.driver_name }}</td>
+                                    <td>
+                                        <span class="badge
+                                            {% if ambulance.status == 'available' %}bg-success
+                                            {% elif ambulance.status == 'on_trip' %}bg-warning
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ ambulance.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ ambulance.get_ambulance_type_display }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

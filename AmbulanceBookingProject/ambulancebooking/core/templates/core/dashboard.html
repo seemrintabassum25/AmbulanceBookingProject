@@ -1,0 +1,99 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">User Dashboard</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Bookings</h5>
+                    <h2>{{ total_bookings }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Pending</h5>
+                    <h2>{{ pending_bookings }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Completed</h5>
+                    <h2>{{ completed_bookings }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Active</h5>
+                    <h2>{{ pending_bookings }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Recent Bookings</h5>
+                </div>
+                <div class="card-body">
+                    {% if user_bookings %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Booking ID</th>
+                                        <th>Patient Name</th>
+                                        <th>Pickup Location</th>
+                                        <th>Status</th>
+                                        <th>Booking Time</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in user_bookings %}
+                                    <tr>
+                                        <td>#{{ booking.id }}</td>
+                                        <td>{{ booking.patient_name }}</td>
+                                        <td>{{ booking.pickup_location }}</td>
+                                        <td>
+                                            <span class="badge
+                                                {% if booking.status == 'pending' %}bg-warning
+                                                {% elif booking.status == 'accepted' %}bg-primary
+                                                {% elif booking.status == 'en_route' %}bg-info
+                                                {% elif booking.status == 'completed' %}bg-success
+                                                {% elif booking.status == 'cancelled' %}bg-danger
+                                                {% endif %}">
+                                                {{ booking.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ booking.booking_time|date:"M d, Y H:i" }}</td>
+                                        <td>
+                                            <a href="{% url 'booking_status' booking.id %}" class="btn btn-sm btn-info">View</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No bookings found.</p>
+                        <div class="text-center">
+                            <a href="{% url 'book_ambulance' %}" class="btn btn-primary">Book Your First Ambulance</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
