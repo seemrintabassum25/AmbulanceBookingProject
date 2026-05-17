@@ -18,6 +18,7 @@ class BookingAdmin(admin.ModelAdmin):
     list_filter = ['status']
     search_fields = ['patient_name', 'user__username']
     date_hierarchy = 'booking_time'
+    list_editable = ['status']
 
 @admin.register(EmergencyContact)
 class EmergencyContactAdmin(admin.ModelAdmin):
